@@ -66,5 +66,4 @@ public class XMLtransformar {
             transformador.transform(fuente, resultado);
         }
     }
-    
 }
