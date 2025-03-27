@@ -55,6 +55,7 @@ public class Main {
                 } else {
                     System.out.println("Fichero no encontrado");
                 }
+            }
 
             case 3 -> {
                 if (datos == null || archivoActual == null) {
@@ -86,4 +87,7 @@ public class Main {
         case 4 -> salir = true;
         default -> System.out.println("Opción no válida");
     }   
+}
+
+}
 }
