@@ -5,25 +5,25 @@ import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 public class XMLtransformar {
 
-    public static List<LinkedHashMap<String, String>> transformarXML(String xml) throws Exception {
+    public static List<LinkedHashMap<String, String>> transformar(File archivo) throws Exception {
         List<LinkedHashMap<String, String>> lista = new ArrayList<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document documento = builder.parse(archivo);
         documento.getDocumentElement().normalize(); 
-        NodeList listaNodos = documento.getElementsByTagName("persona");
+        NodeList nodos = documento.getDocumentElement().getChildNodes();
 
         for (int i = 0; i < nodos.getLength(); i++) {
             Node nodo = nodos.item(i);
             if (nodo.getNodeType() == Node.ELEMENT_NODE) {
                 Element elemento = (Element) nodo;
-                LinkedHashMap<String, String> persona = new LinkedHashMap<>();
+                LinkedHashMap<String, String> mapa = new LinkedHashMap<>();
 
                 NodeList hijos = elemento.getChildNodes();
                 for (int j = 0; j < hijos.getLength(); j++) {
@@ -38,18 +38,19 @@ public class XMLtransformar {
         return lista;
     }
 
-    public static void transformarXML(String xml, String salida) throws Exception {
+    public static void escribir(List<LinkedHashMap<String, String>> datos, File archivo) throws Exception {
         if (datos.isEmpty()) {
-            return;
+            throw new Exception("datos is empty");
+        }
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document documento = builder.newDocument();
-            Element raiz = documento.createElement("personas");
+            Element raiz = documento.createElement("elementos");
             documento.appendChild(raiz);
 
             for (LinkedHashMap<String, String> mapa : datos) {
-                Element items = documento.createElement("persona");
+                Element items = documento.createElement("elementos");
                 for (Map.Entry<String, String> entrada : mapa.entrySet()) {
                     Element campo = documento.createElement(entrada.getKey());
                     campo.appendChild(documento.createTextNode(entrada.getValue()));
@@ -66,4 +67,3 @@ public class XMLtransformar {
             transformador.transform(fuente, resultado);
         }
     }
-}

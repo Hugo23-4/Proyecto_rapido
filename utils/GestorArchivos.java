@@ -2,7 +2,7 @@ package utils;
 
 import java.io.File;
 
-public class File {
+public class GestorArchivos {
 
     private File carpetaSeleccionada;
 

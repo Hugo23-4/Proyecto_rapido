@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
         Menu menu = new Menu();
-        File file = new File();
+        GestorArchivos gestor = new GestorArchivos();
 
         List<LinkedHashMap<String, String>> datos = null;
         File archivoActual = null;
@@ -16,33 +16,35 @@ public class Main {
         boolean salir = false;
         while (!salir) {
             int opcion = menu.mostrarMenu(
-                file.getCarpetaSeleccionada() != null ?
-                            file.getCarpetaSeleccionada().getAbsolutePath() : null,
-                    file.listarContenidoCarpeta(),
+                gestor.getCarpetaSeleccionada() != null ?
+                            gestor.getCarpetaSeleccionada().getAbsolutePath() : null,
+                    gestor.listarContenidoCarpeta(),
                     archivoActual != null ? archivoActual.getName() : null
             );
 
             switch (opcion) {
-                case 1 -> menu.pedirRutaCarpeta();
-                if (file.seleccionCarpeta()) {
-                    System.out.println("Carpeta seleccionada correctamente");
-                    archivoActual = null;
-                    datos = null;
-                }else {
-                    System.out.println("Error al seleccionar la carpeta");
+                case 1 -> {
+                    String rutaCarpeta = menu.pedirRutaCarpeta();
+                    if (gestor.seleccionarCarpeta(rutaCarpeta)) {
+                        System.out.println("Carpeta seleccionada correctamente");
+                        archivoActual = null;
+                        datos = null;
+                    }else {
+                        System.out.println("Error al seleccionar la carpeta");
+                    }
                 }
 
                 case 2 -> {
                 String nombreFichero = menu.pedirNombreFichero();
-                File archivo = file.obtenerArchivo(nombre);
+                File archivo = gestor.obtenerArchivo(nombreFichero);
                 if (archivo != null) {
                     try {
-                        if (nombre.edsWith(".csv")) {
-                            datos = CSVtransformar.transformar(archivo);
-                        } else if (nombre.endsWith(".xml")) {
+                        if (nombreFichero.endsWith(".csv")) {
+                            datos = CSVtransformar.leerCSV(archivo);
+                        } else if (nombreFichero.endsWith(".xml")) {
                             datos = XMLtransformar.transformar(archivo);
-                        } else if (nombre.endsWith(".json")) {
-                            datos = JSONtransformar.transformar(archivo);
+                        } else if (nombreFichero.endsWith(".json")) {
+                            datos = JSONtransformar.leerJSON(archivo);
                         } else {
                             System.out.println("Formato de archivo no soportado");
                         break;
@@ -65,13 +67,13 @@ public class Main {
 
                 String formatoDestino = menu.pedirFormatoDestino();
                 String nombreArchivoSalida = menu.pedirNombreArchivoSalida();
-                File salida = new File (file.getCarpetaSeleccionada(), nombreSalida + "." + formato);
+                File salida = new File (gestor.getCarpetaSeleccionada(), nombreArchivoSalida + "." + formatoDestino);
             
                 try {
-                    switch (formato) {
-                        case "csv" -> CSVtransformar.escribirCSV(datos, salida);
+                    switch (formatoDestino) {
+                        case "csv" -> CSVtransformar.escribirCSV(salida, datos);
                         case "xml" -> XMLtransformar.escribir(datos, salida);
-                        case "json" -> JSONtransformar.escribir(datos, salida);
+                        case "json" -> JSONtransformar.escribirJSON(salida, datos);
                         default -> { System.out.println("Formato de salida no soportado");
                     continue;
                 }
